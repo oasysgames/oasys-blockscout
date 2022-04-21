@@ -1,7 +1,7 @@
 defmodule BlockScoutWeb.Resolvers.Address do
   @moduledoc false
 
-  alias Explorer.Chain
+  alias Explorer.{Chain, GraphQL, Repo}
 
   def get_by(_, %{hashes: hashes}, _) do
     case Chain.hashes_to_addresses(hashes) do
@@ -15,5 +15,16 @@ defmodule BlockScoutWeb.Resolvers.Address do
       {:error, :not_found} -> {:error, "Address not found."}
       {:ok, _} = result -> result
     end
+  end
+
+  def wealthy_addresses(_, %{page_number: _, page_size: _} = args, _) do
+    GraphQL.wealthy_addresses_query(args)
+    |> Repo.all
+    |> case do
+         nil ->
+           {:error, "Something is wrong."}
+         addresses ->
+           {:ok, addresses}
+       end
   end
 end

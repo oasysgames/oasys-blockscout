@@ -15,10 +15,45 @@ defmodule Explorer.GraphQL do
     Hash,
     InternalTransaction,
     TokenTransfer,
-    Transaction
+    Block,
+    Transaction,
+    Address
   }
 
   alias Explorer.{Chain, Repo}
+
+  @doc """
+  Returns a query to fetch transaction list.
+  """
+  @spec block_list_query(map()) :: Ecto.Query.t()
+  def block_list_query(%{page_number: page_number, page_size: page_size}) do
+    offset = (max(page_number, 1) - 1) * page_size
+    from(
+      b in Block,
+      order_by: [desc: b.timestamp],
+      limit: ^page_size,
+      offset: ^offset,
+      select: b
+    )
+  end
+
+  @doc """
+  Returns a query to fetch wealthy addresses.
+  """
+  @spec wealthy_addresses_query(map()) :: Ecto.Query.t()
+  def wealthy_addresses_query(%{page_number: page_number, page_size: page_size}) do
+    offset = (max(page_number, 1) - 1) * page_size
+    from(
+      a in Address,
+      where: a.fetched_coin_balance > ^0,
+      order_by: [
+        desc: a.fetched_coin_balance
+      ],
+      limit: ^page_size,
+      offset: ^offset,
+      select: a
+    )
+  end
 
   @doc """
   Returns a query to fetch transactions with a matching `to_address_hash`,
@@ -68,6 +103,32 @@ defmodule Explorer.GraphQL do
     query
     |> InternalTransaction.where_nonpending_block()
     |> Chain.where_transaction_has_multiple_internal_transactions()
+  end
+
+  @doc """
+  Returns a query to fetch total transaction count.
+  """
+  @spec total_transaction_query() :: Ecto.Query.t()
+  def total_transaction_query() do
+    from(
+      t in Transaction,
+      select: count("*")
+    )
+  end
+
+  @doc """
+  Returns a query to fetch transaction list.
+  """
+  @spec total_list_query(map()) :: Ecto.Query.t()
+  def total_list_query(%{page_number: page_number, page_size: page_size}) do
+    offset = (max(page_number, 1) - 1) * page_size
+    from(
+      t in Transaction,
+      order_by: [desc: t.inserted_at],
+      limit: ^page_size,
+      offset: ^offset,
+      select: t
+    )
   end
 
   @doc """
