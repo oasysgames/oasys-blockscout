@@ -73,10 +73,29 @@ defmodule BlockScoutWeb.Schema do
       complexity(fn %{hashes: hashes}, child_complexity -> length(hashes) * child_complexity end)
     end
 
+    @desc "Gets addresses sorted by balance."
+    field :wealthy_addresses, list_of(:address) do
+      arg(:page_number, non_null(:integer))
+      arg(:page_size, non_null(:integer))
+      resolve(&Address.wealthy_addresses/3)
+    end
+
     @desc "Gets a block by number."
     field :block, :block do
       arg(:number, non_null(:integer))
       resolve(&Block.get_by/3)
+    end
+
+    @desc "Gets block height."
+    field :block_height, non_null(:integer) do
+      resolve(&Block.block_height/2)
+    end
+
+    @desc "Gets block list."
+    field :blocks, list_of(:block) do
+      arg(:page_number, non_null(:integer))
+      arg(:page_size, non_null(:integer))
+      resolve(&Block.list/3)
     end
 
     @desc "Gets token transfers by token contract address hash."
@@ -99,6 +118,18 @@ defmodule BlockScoutWeb.Schema do
     field :transaction, :transaction do
       arg(:hash, non_null(:full_hash))
       resolve(&Transaction.get_by/3)
+    end
+
+    @desc "Gets total transaction count."
+    field :total_transaction, non_null(:integer) do
+      resolve(&Transaction.total_count/2)
+    end
+
+    @desc "Gets transaction list."
+    field :transactions, list_of(:transaction) do
+      arg(:page_number, non_null(:integer))
+      arg(:page_size, non_null(:integer))
+      resolve(&Transaction.transactions/3)
     end
   end
 
