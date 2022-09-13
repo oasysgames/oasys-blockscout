@@ -82,3 +82,6 @@ WORKDIR /app
 
 COPY --from=builder /opt/release/blockscout .
 COPY --from=builder /app/apps/explorer/node_modules ./node_modules
+
+COPY docker/run.sh /run.sh
+CMD ["/bin/sh", "/run.sh"]
