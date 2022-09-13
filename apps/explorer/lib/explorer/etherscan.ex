@@ -80,6 +80,7 @@ defmodule Explorer.Etherscan do
     created_contract_address_hash
     input
     type
+    call_type
     gas
     gas_used
     error
@@ -201,6 +202,14 @@ defmodule Explorer.Etherscan do
       query_to_address_hash_wrapped
       |> union(^query_from_address_hash_wrapped)
       |> union(^query_created_contract_address_hash_wrapped)
+      |> Chain.wrapped_union_subquery()
+      |> order_by(
+        [q],
+        [
+          {^options.order_by_direction, q.block_number},
+          desc: q.index
+        ]
+      )
       |> Repo.replica().all()
     else
       query =
@@ -318,14 +327,14 @@ defmodule Explorer.Etherscan do
         inner_join: t in assoc(ctb, :token),
         where: ctb.address_hash == ^address_hash,
         where: ctb.value > 0,
-        distinct: :token_contract_address_hash,
         select: %{
           balance: ctb.value,
           contract_address_hash: ctb.token_contract_address_hash,
           name: t.name,
           decimals: t.decimals,
           symbol: t.symbol,
-          type: t.type
+          type: t.type,
+          id: ctb.token_id
         }
       )
 

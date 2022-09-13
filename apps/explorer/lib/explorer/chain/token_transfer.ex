@@ -177,7 +177,7 @@ defmodule Explorer.Chain.TokenTransfer do
       from(
         tt in TokenTransfer,
         where: tt.token_contract_address_hash == ^token_address_hash,
-        where: tt.token_id == ^token_id,
+        where: tt.token_id == ^token_id or fragment("? @> ARRAY[?::decimal]", tt.token_ids, ^Decimal.new(token_id)),
         where: not is_nil(tt.block_number),
         preload: [{:transaction, :block}, :token, :from_address, :to_address],
         order_by: [desc: tt.block_number]
@@ -206,7 +206,9 @@ defmodule Explorer.Chain.TokenTransfer do
     query =
       from(
         tt in TokenTransfer,
-        where: tt.token_contract_address_hash == ^token_address_hash and tt.token_id == ^token_id,
+        where:
+          tt.token_contract_address_hash == ^token_address_hash and
+            (tt.token_id == ^token_id or fragment("? @> ARRAY[?::decimal]", tt.token_ids, ^Decimal.new(token_id))),
         select: fragment("COUNT(*)")
       )
 
@@ -214,6 +216,10 @@ defmodule Explorer.Chain.TokenTransfer do
   end
 
   def page_token_transfer(query, %PagingOptions{key: nil}), do: query
+
+  def page_token_transfer(query, %PagingOptions{key: {token_id}, asc_order: true}) do
+    where(query, [tt], tt.token_id > ^token_id)
+  end
 
   def page_token_transfer(query, %PagingOptions{key: {token_id}}) do
     where(query, [tt], tt.token_id < ^token_id)
@@ -307,7 +313,7 @@ defmodule Explorer.Chain.TokenTransfer do
   To find out its current owner, it is necessary to look at the token last
   transfer.
   """
-  @spec address_to_unique_tokens(Hash.Address.t()) :: %Ecto.Query{}
+  @spec address_to_unique_tokens(Hash.Address.t()) :: Ecto.Query.t()
   def address_to_unique_tokens(contract_address_hash) do
     from(
       tt in TokenTransfer,

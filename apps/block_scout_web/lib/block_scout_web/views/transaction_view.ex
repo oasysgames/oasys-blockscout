@@ -392,7 +392,7 @@ defmodule BlockScoutWeb.TransactionView do
   def gas_used_perc(%Transaction{gas_used: nil}), do: nil
 
   def gas_used_perc(%Transaction{gas_used: gas_used, gas: gas}) do
-    if Decimal.cmp(gas, 0) == :gt do
+    if Decimal.compare(gas, 0) == :gt do
       gas_used
       |> Decimal.div(gas)
       |> Decimal.mult(100)
@@ -567,7 +567,7 @@ defmodule BlockScoutWeb.TransactionView do
   end
 
   # Function decodes revert reason of the transaction
-  @spec decoded_revert_reason(%Transaction{} | nil) :: binary() | nil
+  @spec decoded_revert_reason(Transaction.t() | nil) :: binary() | nil
   def decoded_revert_reason(transaction) do
     revert_reason = get_pure_transaction_revert_reason(transaction)
 

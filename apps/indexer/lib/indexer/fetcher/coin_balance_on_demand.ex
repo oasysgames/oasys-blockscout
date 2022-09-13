@@ -64,10 +64,12 @@ defmodule Indexer.Fetcher.CoinBalanceOnDemand do
     GenServer.start_link(__MODULE__, json_rpc_named_arguments, server_opts)
   end
 
+  @impl true
   def init(json_rpc_named_arguments) do
     {:ok, %{json_rpc_named_arguments: json_rpc_named_arguments}}
   end
 
+  @impl true
   def handle_cast({:fetch_and_update, block_number, address}, state) do
     result = fetch_and_update(block_number, address, state.json_rpc_named_arguments)
 
@@ -78,15 +80,27 @@ defmodule Indexer.Fetcher.CoinBalanceOnDemand do
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({:fetch_and_import, block_number, address}, state) do
     fetch_and_import(block_number, address, state.json_rpc_named_arguments)
 
     {:noreply, state}
   end
 
+  @impl true
   def handle_cast({:fetch_and_import_daily_balances, block_number, address}, state) do
     fetch_and_import_daily_balances(block_number, address, state.json_rpc_named_arguments)
 
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({:DOWN, _, :process, _, _}, state) do
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({_ref, _}, state) do
     {:noreply, state}
   end
 
@@ -230,7 +244,8 @@ defmodule Indexer.Fetcher.CoinBalanceOnDemand do
         if average_block_time == 0 do
           {:error, :empty_database}
         else
-          block_number - div(:timer.minutes(Application.get_env(:indexer, __MODULE__)[:threshold]), average_block_time)
+          threshold = Application.get_env(:indexer, __MODULE__)[:threshold]
+          block_number - div(:timer.minutes(threshold), average_block_time)
         end
     end
   end
