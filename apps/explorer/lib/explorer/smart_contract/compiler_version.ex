@@ -3,6 +3,8 @@ defmodule Explorer.SmartContract.CompilerVersion do
   Adapter for fetching compiler versions from https://solc-bin.ethereum.org/bin/list.json.
   """
 
+  alias Explorer.SmartContract.RustVerifierInterface
+
   @unsupported_solc_versions ~w(0.1.1 0.1.2)
   @unsupported_vyper_versions ~w(v0.2.9 v0.2.10)
 
@@ -18,17 +20,21 @@ defmodule Explorer.SmartContract.CompilerVersion do
   end
 
   defp fetch_solc_versions do
-    headers = [{"Content-Type", "application/json"}]
+    if RustVerifierInterface.enabled?() do
+      RustVerifierInterface.get_versions_list()
+    else
+      headers = [{"Content-Type", "application/json"}]
 
-    case HTTPoison.get(source_url(:solc), headers) do
-      {:ok, %{status_code: 200, body: body}} ->
-        {:ok, format_data(body, :solc)}
+      case HTTPoison.get(source_url(:solc), headers) do
+        {:ok, %{status_code: 200, body: body}} ->
+          {:ok, format_data(body, :solc)}
 
-      {:ok, %{status_code: _status_code, body: body}} ->
-        {:error, decode_json(body)["error"]}
+        {:ok, %{status_code: _status_code, body: body}} ->
+          {:error, decode_json(body)["error"]}
 
-      {:error, %{reason: reason}} ->
-        {:error, reason}
+        {:error, %{reason: reason}} ->
+          {:error, reason}
+      end
     end
   end
 
@@ -77,7 +83,9 @@ defmodule Explorer.SmartContract.CompilerVersion do
             minor2 = versions2 |> Enum.at(1) |> parse_integer()
             patch1 = versions1 |> Enum.at(2) |> String.split("-") |> Enum.at(0) |> parse_integer()
             patch2 = versions2 |> Enum.at(2) |> String.split("-") |> Enum.at(0) |> parse_integer()
-            major1 >= major2 && minor1 >= minor2 && patch1 >= patch2
+
+            major1 > major2 || (major1 == major2 && minor1 > minor2) ||
+              (major1 == major2 && minor1 == minor2 && patch1 > patch2)
           end)
       end
 

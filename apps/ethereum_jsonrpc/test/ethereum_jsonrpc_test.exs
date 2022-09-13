@@ -604,13 +604,13 @@ defmodule EthereumJSONRPCTest do
       # Can't be faked reliably on real chain
       moxed_json_rpc_named_arguments = Keyword.put(json_rpc_named_arguments, :transport, EthereumJSONRPC.Mox)
 
-      unknown_error = {:error, %{"code" => 500, "message" => "Unknown error"}}
+      unknown_error = %{"code" => 500, "message" => "Unknown error"}
 
       expect(EthereumJSONRPC.Mox, :json_rpc, fn _json, _options ->
-        unknown_error
+        {:error, unknown_error}
       end)
 
-      assert {:error, unknown_error} =
+      assert {:error, ^unknown_error} =
                EthereumJSONRPC.fetch_block_number_by_tag("latest", moxed_json_rpc_named_arguments)
     end
   end
@@ -910,6 +910,68 @@ defmodule EthereumJSONRPCTest do
     after
       0 ->
         :ok
+    end
+  end
+end
+
+defmodule EthereumJSONRPCSyncTest do
+  use EthereumJSONRPC.Case, async: false
+
+  import EthereumJSONRPC.Case
+  import Mox
+
+  alias EthereumJSONRPC.FetchedBalances
+  setup :verify_on_exit!
+
+  @moduletag :capture_log
+
+  describe "fetch_balances/1" do
+    setup do
+      initial_env = Application.get_all_env(:indexer)
+      on_exit(fn -> Application.put_all_env([{:indexer, initial_env}]) end)
+    end
+
+    test "ignores all request with block_quantity != latest when env ETHEREUM_JSONRPC_DISABLE_ARCHIVE_BALANCES is true",
+         %{
+           json_rpc_named_arguments: json_rpc_named_arguments
+         } do
+      hash = "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
+      expected_fetched_balance = 1
+
+      expect(EthereumJSONRPC.Mox, :json_rpc, 1, fn [
+                                                     %{
+                                                       id: 0,
+                                                       jsonrpc: "2.0",
+                                                       method: "eth_getBalance",
+                                                       params: [^hash, "latest"]
+                                                     }
+                                                   ],
+                                                   _options ->
+        {:ok, [%{id: 0, result: EthereumJSONRPC.integer_to_quantity(expected_fetched_balance)}]}
+      end)
+
+      Application.put_env(:ethereum_jsonrpc, :disable_archive_balances?, "true")
+
+      assert EthereumJSONRPC.fetch_balances(
+               [
+                 %{block_quantity: "0x1", hash_data: hash},
+                 %{block_quantity: "0x2", hash_data: hash},
+                 %{block_quantity: "0x3", hash_data: hash},
+                 %{block_quantity: "0x4", hash_data: hash},
+                 %{block_quantity: "latest", hash_data: hash}
+               ],
+               json_rpc_named_arguments
+             ) ==
+               {:ok,
+                %FetchedBalances{
+                  params_list: [
+                    %{
+                      address_hash: hash,
+                      block_number: :error,
+                      value: expected_fetched_balance
+                    }
+                  ]
+                }}
     end
   end
 end

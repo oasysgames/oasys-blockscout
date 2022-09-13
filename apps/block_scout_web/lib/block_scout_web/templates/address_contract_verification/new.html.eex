@@ -9,7 +9,7 @@
           [],
           fn f -> %>
 
-        <%= render BlockScoutWeb.AddressContractVerificationCommonFieldsView, "_contract_address_field.html", address_hash: @address_hash, f: f %>
+        <%= render BlockScoutWeb.AddressContractVerificationCommonFieldsView, "_contract_address_field.html", f: f %>
 
         <div class="smart-contract-form-group">
           <div class="smart-contract-form-group-inner-wrapper">
@@ -31,6 +31,13 @@
                     <%= radio_button f, :verify_via, false, class: "form-check-input verify-via-sourcify" %>
                     <div class="radio-icon"></div>
                     <%= label :verify_via, :false, gettext("Via Sourcify: Sources and metadata JSON file"), class: "radio-text" %>
+                  </div>
+                <% end %>
+                <%= if RustVerifierInterface.enabled?() do %>
+                  <div class="radio-big">
+                    <%= radio_button f, :verify_via, false, class: "form-check-input verify-via-multi-part-files" %>
+                    <div class="radio-icon"></div>
+                    <%= label :verify_via, :false, gettext("Via multi-part files"), class: "radio-text" %>
                   </div>
                 <% end %>
                 <div class="radio-big">
@@ -95,7 +102,15 @@
           <%= link(
             gettext("Next"),
             to: address_verify_contract_via_standard_json_input_path(@conn, :new, @address_hash),
-            id: "verify_via_standard_json_input",
+            id: "verify_via_standard_json_input_button",
+            class: "btn-full-primary mr-2",
+            style: "display: none;",
+            "data-button-loading": "animation"
+          ) %>
+          <%= link(
+            gettext("Next"),
+            to: address_verify_contract_via_multi_part_files_path(@conn, :new, @address_hash),
+            id: "verify_via_multi_part_files_button",
             class: "btn-full-primary mr-2",
             style: "display: none;",
             "data-button-loading": "animation"
