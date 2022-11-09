@@ -13,7 +13,7 @@ defmodule BlockScoutWeb.CaptchaHelper do
 
     headers = [{"Content-type", "application/x-www-form-urlencoded"}]
 
-    case HTTPoison.post("https://www.google.com/recaptcha/api/siteverify", body, headers, []) do
+    case HTTPoison.post("https://recaptchaenterprise.googleapis.com", body, headers, []) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         case Jason.decode!(body) do
           %{"success" => true} -> true
