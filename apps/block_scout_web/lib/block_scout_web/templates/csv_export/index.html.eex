@@ -30,7 +30,7 @@
     var onloadCallback = function() {
       var reCaptchaClientKey = '<%= Application.get_env(:block_scout_web, :re_captcha_client_key) %>' 
       if (reCaptchaClientKey) {
-        widgetId1 = grecaptcha.render('recaptcha', {
+        widgetId1 = grecaptcha.enterprise.render('recaptcha', {
           'sitekey': reCaptchaClientKey,
           'theme': localStorage.getItem('current-color-mode'),
           'callback': function () {
@@ -46,7 +46,7 @@
       }
     }
   </script>
-  <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer>
+  <script src="https://www.google.com/recaptcha/enterprise.js?onload=onloadCallback&render=explicit" async defer>
   </script>
   <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/csv-download.js") %>"></script>
 </section>
