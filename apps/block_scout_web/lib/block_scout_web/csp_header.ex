@@ -11,6 +11,7 @@ defmodule BlockScoutWeb.CSPHeader do
   def call(conn, _opts) do
     config = Application.get_env(:block_scout_web, __MODULE__)
     google_url = "https://www.google.com"
+    google_tag_manager_url = "https://www.googletagmanager.com"
     czilladx_url = "https://request-global.czilladx.com"
     coinzillatag_url = "https://coinzillatag.com"
     trustwallet_url = "https://raw.githubusercontent.com/trustwallet/assets/"
@@ -21,7 +22,7 @@ defmodule BlockScoutWeb.CSPHeader do
       "content-security-policy" => "\
         connect-src 'self' #{json_rpc_url} #{config[:mixpanel_url]} #{config[:amplitude_url]} #{websocket_endpoints(conn)} #{czilladx_url} #{trustwallet_url} #{walletconnect_urls};\
         default-src 'self';\
-        script-src 'self' 'unsafe-inline' 'unsafe-eval' #{coinzillatag_url} #{google_url} https://www.gstatic.com;\
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' #{coinzillatag_url} #{google_url} https://www.gstatic.com #{google_tag_manager_url};\
         style-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com;\
         img-src 'self' * data:;\
         media-src 'self' * data:;\
