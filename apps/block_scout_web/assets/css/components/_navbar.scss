@@ -31,7 +31,7 @@ $header-logo-text-color: #333 !default;
       color: $header-links-color;
       background-color: $header-links-background-color;
     }
-    
+
     .nav-link {
       outline: none;
       align-items: center;
@@ -53,9 +53,7 @@ $header-logo-text-color: #333 !default;
         top: -10px;
         transform: translateX(-50%);
         transition: $transition-cont;
-        width: calc(
-          100% - #{$header-link-horizontal-padding} - #{$header-link-horizontal-padding}
-        );
+        width: calc(100% - #{$header-link-horizontal-padding} - #{$header-link-horizontal-padding});
       }
 
       &.active,
@@ -71,6 +69,7 @@ $header-logo-text-color: #333 !default;
       &:hover,
       &.active-icon {
         color: $header-links-color-active;
+
         .nav-link-icon {
           path {
             fill: $header-icon-color-hover;
@@ -94,6 +93,7 @@ $header-logo-text-color: #333 !default;
 
     .nav-item-networks {
       margin-left: auto;
+
       .nav-link:before {
         display: none;
       }
@@ -109,6 +109,7 @@ $header-logo-text-color: #333 !default;
       background-image: url($header-toggler-icon);
     }
   }
+
   .search-form {
     display: flex;
 
@@ -140,20 +141,28 @@ $header-logo-text-color: #333 !default;
     width: 100%;
     z-index: 1;
 
-    &[placeholder]{
+    &[placeholder] {
       text-overflow: ellipsis !important;
     }
-    &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-        text-overflow: ellipsis  !important;
+
+    &::-webkit-input-placeholder {
+      /* Chrome/Opera/Safari */
+      text-overflow: ellipsis !important;
     }
-    &::-moz-placeholder { /* Firefox 19+ */
-        text-overflow: ellipsis  !important;
+
+    &::-moz-placeholder {
+      /* Firefox 19+ */
+      text-overflow: ellipsis !important;
     }
-    &:-ms-input-placeholder { /* IE 10+ */
-        text-overflow: ellipsis  !important;
+
+    &:-ms-input-placeholder {
+      /* IE 10+ */
+      text-overflow: ellipsis !important;
     }
-    &:-moz-placeholder { /* Firefox 18- */
-        text-overflow: ellipsis  !important;
+
+    &:-moz-placeholder {
+      /* Firefox 18- */
+      text-overflow: ellipsis !important;
     }
 
     &:focus {
@@ -163,13 +172,16 @@ $header-logo-text-color: #333 !default;
     @include media-breakpoint-up(xl) {
       width: 290px;
     }
+
     @media (min-width: 1366px) {
       width: 380px;
     }
+
     @media (min-width: 1540px) {
       width: 550px;
     }
   }
+
   .input-group-append {
     height: 38px;
     position: absolute;
@@ -198,6 +210,7 @@ $header-logo-text-color: #333 !default;
       fill: $header-textfield-magnifier-color;
     }
   }
+
   .input-group-text {
     align-items: center;
     background: none;
@@ -232,9 +245,11 @@ $header-logo-text-color: #333 !default;
     }
 
   }
+
   .input-group {
     width: 100%;
   }
+
   .navbar-nav {
     white-space: nowrap;
   }
@@ -244,6 +259,7 @@ $header-logo-text-color: #333 !default;
   margin-left: 0;
   flex-shrink: 1;
   display: inline-flex;
+
   .navbar-logo {
     max-width: 100%;
   }
@@ -285,12 +301,14 @@ $header-logo-text-color: #333 !default;
   justify-content: flex-end;
   align-items: flex-start;
   flex-shrink: 0;
+
   @media (min-width: 992px) {
     align-items: center;
   }
 }
 
-.navbar-container, .navbar-primary {
+.navbar-container,
+.navbar-primary {
   @media (min-width: 992px) {
     padding-right: 0;
   }

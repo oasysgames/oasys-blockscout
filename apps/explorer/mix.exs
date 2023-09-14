@@ -82,7 +82,7 @@ defmodule Explorer.Mixfile do
       {:ex_machina, "~> 2.3", only: [:test]},
       {:exvcr, "~> 0.10", only: :test},
       {:httpoison, "~> 2.0"},
-      {:jason, "~> 1.3"},
+      {:jason, "~> 1.4"},
       {:junit_formatter, ">= 0.0.0", only: [:test], runtime: false},
       # Log errors and application output to separate files
       {:logger_file_backend, "~> 0.0.10"},

@@ -19,12 +19,21 @@ RUN set -ex && \
     /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
 ARG CACHE_EXCHANGE_RATES_PERIOD
-ARG API_V1_READ_METHODS_DISABLED
+ARG DISABLE_READ_API
+ARG API_PATH
+ARG NETWORK_PATH
 ARG DISABLE_WEBAPP
-ARG API_V1_WRITE_METHODS_DISABLED
-ARG CACHE_TOTAL_GAS_USAGE_COUNTER_ENABLED
+ARG DISABLE_WRITE_API
+ARG CACHE_ENABLE_TOTAL_GAS_USAGE_COUNTER
+ARG WOBSERVER_ENABLED
 ARG ADMIN_PANEL_ENABLED
 ARG CACHE_ADDRESS_WITH_BALANCES_UPDATE_INTERVAL
+ARG SOCKET_ROOT
+ARG COIN
+ARG API_V1_READ_METHODS_DISABLED
+ARG API_V1_WRITE_METHODS_DISABLED
+ARG CACHE_TOTAL_GAS_USAGE_COUNTER_ENABLED
+ARG CACHE_ADDRESS_WITHBALANCES_UPDATE_INTERVAL
 ARG SESSION_COOKIE_DOMAIN
 ARG MIXPANEL_TOKEN
 ARG MIXPANEL_URL
@@ -43,6 +52,14 @@ RUN mix do deps.get, local.rebar --force, deps.compile
 ADD . .
 
 COPY . .
+
+RUN if [ "$COIN" != "" ]; then \
+        sed -i s/"POA"/"${COIN}"/g apps/block_scout_web/priv/gettext/en/LC_MESSAGES/default.po; \
+        sed -i "/msgid \"Ether\"/{n;s/msgstr \"\"/msgstr \"${COIN}\"/g}" apps/block_scout_web/priv/gettext/default.pot; \
+        sed -i "/msgid \"Ether\"/{n;s/msgstr \"\"/msgstr \"${COIN}\"/g}" apps/block_scout_web/priv/gettext/en/LC_MESSAGES/default.po; \
+        sed -i "/msgid \"ETH\"/{n;s/msgstr \"\"/msgstr \"${COIN}\"/g}" apps/block_scout_web/priv/gettext/default.pot; \
+        sed -i "/msgid \"ETH\"/{n;s/msgstr \"\"/msgstr \"${COIN}\"/g}" apps/block_scout_web/priv/gettext/en/LC_MESSAGES/default.po; \
+    fi
 
 # Run forderground build and phoenix digest
 RUN mix compile && npm install npm@latest
@@ -78,3 +95,6 @@ COPY --from=builder /opt/release/blockscout .
 COPY --from=builder /app/apps/explorer/node_modules ./node_modules
 COPY --from=builder /app/config/config_helper.exs ./config/config_helper.exs
 COPY --from=builder /app/config/config_helper.exs /app/releases/${RELEASE_VERSION}/config_helper.exs
+
+COPY docker/run.sh /run.sh
+CMD ["/bin/sh", "/run.sh"]
