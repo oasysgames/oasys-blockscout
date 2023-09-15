@@ -4,7 +4,7 @@ defmodule EthereumJSONRPC do
 
   ## Configuration
 
-  Configuration for parity URLs can be provided with the following mix config:
+  Configuration for Nethermind URLs can be provided with the following mix config:
 
       config :ethereum_jsonrpc,
         url: "http://localhost:8545",
@@ -25,6 +25,8 @@ defmodule EthereumJSONRPC do
   documentation for `EthereumJSONRPC.RequestCoordinator`.
   """
 
+  require Logger
+
   alias EthereumJSONRPC.{
     Block,
     Blocks,
@@ -36,6 +38,7 @@ defmodule EthereumJSONRPC do
     RequestCoordinator,
     Subscription,
     Transport,
+    Utility.EndpointAvailabilityObserver,
     Variant
   }
 
@@ -83,7 +86,7 @@ defmodule EthereumJSONRPC do
    * `:transport` - the `t:EthereumJSONRPC.Transport.t/0` callback module
    * `:transport_options` - options passed to `c:EthereumJSONRPC.Transport.json_rpc/2`
    * `:variant` - the `t:EthereumJSONRPC.Variant.t/0` callback module
-   * `:throttle_timout` - the maximum amount of time in milliseconds to throttle
+   * `:throttle_timeout` - the maximum amount of time in milliseconds to throttle
      before automatically returning a timeout. Defaults to #{@default_throttle_timeout} milliseconds.
   """
   @type json_rpc_named_arguments :: [
@@ -182,7 +185,7 @@ defmodule EthereumJSONRPC do
           [%{required(:block_quantity) => quantity, required(:hash_data) => data()}],
           json_rpc_named_arguments
         ) :: {:ok, FetchedBalances.t()} | {:error, reason :: term}
-  def fetch_balances(params_list, json_rpc_named_arguments)
+  def fetch_balances(params_list, json_rpc_named_arguments, chunk_size \\ nil)
       when is_list(params_list) and is_list(json_rpc_named_arguments) do
     filtered_params =
       if Application.get_env(:ethereum_jsonrpc, :disable_archive_balances?) do
@@ -200,6 +203,7 @@ defmodule EthereumJSONRPC do
     with {:ok, responses} <-
            id_to_params
            |> FetchedBalances.requests()
+           |> chunk_requests(chunk_size)
            |> json_rpc(json_rpc_named_arguments) do
       {:ok, FetchedBalances.from_responses(responses, id_to_params)}
     end
@@ -256,6 +260,17 @@ defmodule EthereumJSONRPC do
   @spec fetch_blocks_by_range(Range.t(), json_rpc_named_arguments) :: {:ok, Blocks.t()} | {:error, reason :: term}
   def fetch_blocks_by_range(_first.._last = range, json_rpc_named_arguments) do
     range
+    |> Enum.map(fn number -> %{number: number} end)
+    |> fetch_blocks_by_params(&Block.ByNumber.request/1, json_rpc_named_arguments)
+  end
+
+  @doc """
+  Fetches blocks by block number list.
+  """
+  @spec fetch_blocks_by_numbers([block_number()], json_rpc_named_arguments) ::
+          {:ok, Blocks.t()} | {:error, reason :: term}
+  def fetch_blocks_by_numbers(block_numbers, json_rpc_named_arguments) do
+    block_numbers
     |> Enum.map(fn number -> %{number: number} end)
     |> fetch_blocks_by_params(&Block.ByNumber.request/1, json_rpc_named_arguments)
   end
@@ -370,6 +385,29 @@ defmodule EthereumJSONRPC do
   end
 
   @doc """
+  Assigns not matched ids between requests and responses to responses with incorrect ids
+  """
+  def sanitize_responses(responses, id_to_params) do
+    responses
+    |> Enum.reduce(
+      {[], Map.keys(id_to_params) -- Enum.map(responses, & &1.id)},
+      fn
+        %{id: nil} = res, {result_res, [id | rest]} ->
+          Logger.error(
+            "Empty id in response: #{inspect(res)}, stacktrace: #{inspect(Process.info(self(), :current_stacktrace))}"
+          )
+
+          {[%{res | id: id} | result_res], rest}
+
+        res, {result_res, non_matched} ->
+          {[res | result_res], non_matched}
+      end
+    )
+    |> elem(0)
+    |> Enum.reverse()
+  end
+
+  @doc """
     1. POSTs JSON `payload` to `url`
     2. Decodes the response
     3. Handles the response
@@ -388,13 +426,29 @@ defmodule EthereumJSONRPC do
     transport_options = Keyword.fetch!(named_arguments, :transport_options)
     throttle_timeout = Keyword.get(named_arguments, :throttle_timeout, @default_throttle_timeout)
 
-    RequestCoordinator.perform(request, transport, transport_options, throttle_timeout)
+    url = maybe_replace_url(transport_options[:url], transport_options[:fallback_url], transport)
+    corrected_transport_options = Keyword.replace(transport_options, :url, url)
+
+    case RequestCoordinator.perform(request, transport, corrected_transport_options, throttle_timeout) do
+      {:ok, result} ->
+        {:ok, result}
+
+      {:error, reason} ->
+        maybe_inc_error_count(corrected_transport_options[:url], named_arguments, transport)
+        {:error, reason}
+    end
   end
+
+  defp maybe_replace_url(url, _replace_url, EthereumJSONRPC.HTTP), do: url
+  defp maybe_replace_url(url, replace_url, _), do: EndpointAvailabilityObserver.maybe_replace_url(url, replace_url)
+
+  defp maybe_inc_error_count(_url, _arguments, EthereumJSONRPC.HTTP), do: :ok
+  defp maybe_inc_error_count(url, arguments, _), do: EndpointAvailabilityObserver.inc_error_count(url, arguments)
 
   @doc """
   Converts `t:quantity/0` to `t:non_neg_integer/0`.
   """
-  @spec quantity_to_integer(quantity) :: non_neg_integer() | :error
+  @spec quantity_to_integer(quantity) :: non_neg_integer() | nil
   def quantity_to_integer("0x" <> hexadecimal_digits) do
     String.to_integer(hexadecimal_digits, 16)
   end
@@ -404,9 +458,11 @@ defmodule EthereumJSONRPC do
   def quantity_to_integer(string) when is_binary(string) do
     case Integer.parse(string) do
       {integer, ""} -> integer
-      _ -> :error
+      _ -> nil
     end
   end
+
+  def quantity_to_integer(_), do: nil
 
   @doc """
   Converts `t:non_neg_integer/0` to `t:quantity/0`
@@ -464,7 +520,6 @@ defmodule EthereumJSONRPC do
   end
 
   # We can only depend on implementations supporting 64-bit integers:
-  # * Parity only supports u64 (https://github.com/paritytech/jsonrpc-core/blob/f2c61edb817e344d92ab3baf872fa77d1602430a/src/id.rs#L13)
   # * Ganache only supports u32 (https://github.com/trufflesuite/ganache-core/issues/190)
   def unique_request_id do
     <<unique_request_id::big-integer-size(4)-unit(8)>> = :crypto.strong_rand_bytes(4)
@@ -476,7 +531,7 @@ defmodule EthereumJSONRPC do
   """
   def timestamp_to_datetime(timestamp) do
     case quantity_to_integer(timestamp) do
-      :error ->
+      nil ->
         nil
 
       quantity ->
@@ -495,6 +550,9 @@ defmodule EthereumJSONRPC do
       {:ok, Blocks.from_responses(responses, id_to_params)}
     end
   end
+
+  defp chunk_requests(requests, nil), do: requests
+  defp chunk_requests(requests, chunk_size), do: Enum.chunk_every(requests, chunk_size)
 
   def first_block_to_fetch(config) do
     string_value = Application.get_env(:indexer, config)

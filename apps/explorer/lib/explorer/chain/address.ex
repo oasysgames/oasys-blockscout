@@ -20,7 +20,8 @@ defmodule Explorer.Chain.Address do
     SmartContractAdditionalSource,
     Token,
     Transaction,
-    Wei
+    Wei,
+    Withdrawal
   }
 
   alias Explorer.Chain.Cache.NetVersion
@@ -35,7 +36,7 @@ defmodule Explorer.Chain.Address do
   @type hash :: Hash.t()
 
   @typedoc """
-   * `fetched_coin_balance` - The last fetched balance from Parity
+   * `fetched_coin_balance` - The last fetched balance from Nethermind
    * `fetched_coin_balance_block_number` - the `t:Explorer.Chain.Block.t/0` `t:Explorer.Chain.Block.block_number/0` for
      which `fetched_coin_balance` was fetched
    * `hash` - the hash of the address's public key
@@ -120,6 +121,7 @@ defmodule Explorer.Chain.Address do
     has_many(:names, Address.Name, foreign_key: :address_hash)
     has_many(:decompiled_smart_contracts, DecompiledSmartContract, foreign_key: :address_hash)
     has_many(:smart_contract_additional_sources, SmartContractAdditionalSource, foreign_key: :address_hash)
+    has_many(:withdrawals, Withdrawal, foreign_key: :address_hash)
 
     timestamps()
   end
@@ -147,6 +149,8 @@ defmodule Explorer.Chain.Address do
   end
 
   def checksum(address_or_hash, iodata? \\ false)
+
+  def checksum(nil, _iodata?), do: ""
 
   def checksum(%__MODULE__{hash: hash}, iodata?) do
     checksum(hash, iodata?)
@@ -257,6 +261,12 @@ defmodule Explorer.Chain.Address do
       select: fragment("COUNT(*)"),
       where: a.fetched_coin_balance > ^0
     )
+  end
+
+  def fetched_coin_balance(address_hash) when not is_nil(address_hash) do
+    Address
+    |> where([address], address.hash == ^address_hash)
+    |> select([address], address.fetched_coin_balance)
   end
 
   defimpl String.Chars do

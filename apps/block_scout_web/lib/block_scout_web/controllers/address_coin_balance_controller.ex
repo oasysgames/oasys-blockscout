@@ -5,22 +5,23 @@ defmodule BlockScoutWeb.AddressCoinBalanceController do
 
   use BlockScoutWeb, :controller
 
+  import BlockScoutWeb.Account.AuthController, only: [current_user: 1]
   import BlockScoutWeb.Chain, only: [paging_options: 1, next_page_params: 3, split_list_by_page: 1]
+  import BlockScoutWeb.Models.GetAddressTags, only: [get_address_tags: 2]
 
-  alias BlockScoutWeb.{AccessHelpers, AddressCoinBalanceView, Controller}
+  alias BlockScoutWeb.{AccessHelper, AddressCoinBalanceView, Controller}
   alias Explorer.{Chain, Market}
   alias Explorer.Chain.{Address, Wei}
-  alias Explorer.ExchangeRates.Token
   alias Indexer.Fetcher.CoinBalanceOnDemand
   alias Phoenix.View
 
   def index(conn, %{"address_id" => address_hash_string, "type" => "JSON"} = params) do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
-         :ok <- Chain.check_address_exists(address_hash),
-         {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params) do
+         {:ok, address} <- Chain.hash_to_address(address_hash, [], false),
+         {:ok, false} <- AccessHelper.restricted_access?(address_hash_string, params) do
       full_options = paging_options(params)
 
-      coin_balances_plus_one = Chain.address_to_coin_balances(address_hash, full_options)
+      coin_balances_plus_one = Chain.address_to_coin_balances(address, full_options)
 
       {coin_balances, next_page} = split_list_by_page(coin_balances_plus_one)
 
@@ -53,7 +54,7 @@ defmodule BlockScoutWeb.AddressCoinBalanceController do
       {:restricted_access, _} ->
         not_found(conn)
 
-      :not_found ->
+      {:error, :not_found} ->
         case Chain.Hash.Address.validate(address_hash_string) do
           {:ok, _} ->
             json(conn, %{items: [], next_page_path: ""})
@@ -70,13 +71,14 @@ defmodule BlockScoutWeb.AddressCoinBalanceController do
   def index(conn, %{"address_id" => address_hash_string} = params) do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.hash_to_address(address_hash),
-         {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params) do
+         {:ok, false} <- AccessHelper.restricted_access?(address_hash_string, params) do
       render(conn, "index.html",
         address: address,
         coin_balance_status: CoinBalanceOnDemand.trigger_fetch(address),
-        exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
+        exchange_rate: Market.get_coin_exchange_rate(),
         current_path: Controller.current_full_path(conn),
-        counters_path: address_path(conn, :address_counters, %{"id" => Address.checksum(address_hash)})
+        counters_path: address_path(conn, :address_counters, %{"id" => Address.checksum(address_hash)}),
+        tags: get_address_tags(address_hash, current_user(conn))
       )
     else
       {:restricted_access, _} ->
@@ -99,9 +101,10 @@ defmodule BlockScoutWeb.AddressCoinBalanceController do
               "index.html",
               address: address,
               coin_balance_status: nil,
-              exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
+              exchange_rate: Market.get_coin_exchange_rate(),
               counters_path: address_path(conn, :address_counters, %{"id" => Address.checksum(address_hash)}),
-              current_path: Controller.current_full_path(conn)
+              current_path: Controller.current_full_path(conn),
+              tags: get_address_tags(address_hash, current_user(conn))
             )
 
           _ ->

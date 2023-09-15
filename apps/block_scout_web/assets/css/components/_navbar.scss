@@ -1,6 +1,7 @@
 // Default variables
 $header-background-color: #fff !default;
 $header-links-color: #828ba0 !default;
+$header-links-background-color: #fff !default;
 $header-links-color-active: #333 !default;
 $header-icon-color: $header-links-color !default;
 $header-icon-color-hover: $secondary !default;
@@ -11,7 +12,8 @@ $header-textfield-background-color: #f5f6fa !default;
 $header-textfield-magnifier-color: $header-links-color !default;
 $header-link-horizontal-padding: 0.71rem;
 $navbar-logo-height: auto !default;
-$navbar-logo-width: 130px !default;
+$navbar-logo-width: auto !default;
+$header-logo-text-color: #333 !default;
 
 .navbar.navbar-primary {
   background-color: $header-background-color;
@@ -23,7 +25,13 @@ $navbar-logo-width: 130px !default;
   }
 
   .navbar-nav {
-    
+
+    .nav-submenu {
+      padding: 10px 20px;
+      color: $header-links-color;
+      background-color: $header-links-background-color;
+    }
+
     .nav-link {
       outline: none;
       align-items: center;
@@ -45,9 +53,7 @@ $navbar-logo-width: 130px !default;
         top: -10px;
         transform: translateX(-50%);
         transition: $transition-cont;
-        width: calc(
-          100% - #{$header-link-horizontal-padding} - #{$header-link-horizontal-padding}
-        );
+        width: calc(100% - #{$header-link-horizontal-padding} - #{$header-link-horizontal-padding});
       }
 
       &.active,
@@ -63,6 +69,7 @@ $navbar-logo-width: 130px !default;
       &:hover,
       &.active-icon {
         color: $header-links-color-active;
+
         .nav-link-icon {
           path {
             fill: $header-icon-color-hover;
@@ -86,6 +93,7 @@ $navbar-logo-width: 130px !default;
 
     .nav-item-networks {
       margin-left: auto;
+
       .nav-link:before {
         display: none;
       }
@@ -101,6 +109,7 @@ $navbar-logo-width: 130px !default;
       background-image: url($header-toggler-icon);
     }
   }
+
   .search-form {
     display: flex;
 
@@ -132,20 +141,28 @@ $navbar-logo-width: 130px !default;
     width: 100%;
     z-index: 1;
 
-    &[placeholder]{
+    &[placeholder] {
       text-overflow: ellipsis !important;
     }
-    &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-        text-overflow: ellipsis  !important;
+
+    &::-webkit-input-placeholder {
+      /* Chrome/Opera/Safari */
+      text-overflow: ellipsis !important;
     }
-    &::-moz-placeholder { /* Firefox 19+ */
-        text-overflow: ellipsis  !important;
+
+    &::-moz-placeholder {
+      /* Firefox 19+ */
+      text-overflow: ellipsis !important;
     }
-    &:-ms-input-placeholder { /* IE 10+ */
-        text-overflow: ellipsis  !important;
+
+    &:-ms-input-placeholder {
+      /* IE 10+ */
+      text-overflow: ellipsis !important;
     }
-    &:-moz-placeholder { /* Firefox 18- */
-        text-overflow: ellipsis  !important;
+
+    &:-moz-placeholder {
+      /* Firefox 18- */
+      text-overflow: ellipsis !important;
     }
 
     &:focus {
@@ -155,13 +172,16 @@ $navbar-logo-width: 130px !default;
     @include media-breakpoint-up(xl) {
       width: 290px;
     }
+
     @media (min-width: 1366px) {
       width: 380px;
     }
+
     @media (min-width: 1540px) {
       width: 550px;
     }
   }
+
   .input-group-append {
     height: 38px;
     position: absolute;
@@ -190,6 +210,7 @@ $navbar-logo-width: 130px !default;
       fill: $header-textfield-magnifier-color;
     }
   }
+
   .input-group-text {
     align-items: center;
     background: none;
@@ -224,9 +245,11 @@ $navbar-logo-width: 130px !default;
     }
 
   }
+
   .input-group {
     width: 100%;
   }
+
   .navbar-nav {
     white-space: nowrap;
   }
@@ -236,6 +259,7 @@ $navbar-logo-width: 130px !default;
   margin-left: 0;
   flex-shrink: 1;
   display: inline-flex;
+
   .navbar-logo {
     max-width: 100%;
   }
@@ -247,7 +271,7 @@ $navbar-logo-width: 130px !default;
 }
 
 .logo-text {
-  color: #333;
+  color: $header-logo-text-color;
   font-size: 1rem;
   font-weight: 700;
   margin-left: 5px;
@@ -277,12 +301,14 @@ $navbar-logo-width: 130px !default;
   justify-content: flex-end;
   align-items: flex-start;
   flex-shrink: 0;
+
   @media (min-width: 992px) {
     align-items: center;
   }
 }
 
-.navbar-container, .navbar-primary {
+.navbar-container,
+.navbar-primary {
   @media (min-width: 992px) {
     padding-right: 0;
   }
