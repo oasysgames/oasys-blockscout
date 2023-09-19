@@ -14,7 +14,7 @@ const _instance1 = generateDatePicker('.js-datepicker-from', moment().add(-1, 'm
 // eslint-disable-next-line
 const _instance2 = generateDatePicker('.js-datepicker-to', new Date())
 
-function generateDatePicker (classSelector, defaultDate) {
+function generateDatePicker(classSelector, defaultDate) {
   return new Pikaday({
     field: $(classSelector)[0],
     defaultDate,
@@ -59,9 +59,9 @@ $button.on('click', () => {
         })
     })
   } else if (reCaptchaV2ClientKey) {
-  // @ts-ignore
-  // eslint-disable-next-line
-  const recaptchaResponse = grecaptcha.getResponse()
+    // @ts-ignore
+    // eslint-disable-next-line
+    const recaptchaResponse = grecaptcha.getResponse()
     if (recaptchaResponse) {
       disableBtnWithSpinner()
       const url = `${baseURL}&recaptcha_response=${recaptchaResponse}`
@@ -72,7 +72,7 @@ $button.on('click', () => {
     alertWhenRecaptchaNotConfigured()
   }
 
-  function download (url, resetRecaptcha, disable) {
+  function download(url, resetRecaptcha, disable) {
     fetch(url, {
       method: 'GET',
       headers: {
@@ -108,7 +108,7 @@ $button.on('click', () => {
       })
   }
 
-  function resetBtn (resetRecaptcha, disable) {
+  function resetBtn(resetRecaptcha, disable) {
     $button.removeClass('spinner')
     if (!disable) {
       $button.prop('disabled', false)
@@ -121,12 +121,12 @@ $button.on('click', () => {
     }
   }
 
-  function disableBtnWithSpinner () {
+  function disableBtnWithSpinner() {
     $button.addClass('spinner')
     disableBtn()
   }
 
-  function disableBtn () {
+  function disableBtn() {
     $button.prop('disabled', true)
   }
 })
@@ -147,7 +147,7 @@ const onloadCallback = function () {
   })
 }
 
-function alertWhenRecaptchaNotConfigured () {
+function alertWhenRecaptchaNotConfigured() {
   Swal.fire({
     title: 'Warning',
     html: 'CSV download is disabled since reCAPTCHA is not configured on server side. Please advise server maintainer to configure RE_CAPTCHA_CLIENT_KEY and RE_CAPTCHA_SECRET_KEY environment variables in case of reCAPTCHAv2 or RE_CAPTCHA_V3_CLIENT_KEY and RE_CAPTCHA_V3_SECRET_KEY environment variables in case of reCAPTCHAv3.',
@@ -155,7 +155,7 @@ function alertWhenRecaptchaNotConfigured () {
   })
 }
 
-function alertWhenRequestFailed () {
+function alertWhenRequestFailed() {
   Swal.fire({
     title: 'Warning',
     html: 'Request failed, please try again later or decrease time range for exporting data.',
