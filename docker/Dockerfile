@@ -1,22 +1,16 @@
-FROM bitwalker/alpine-elixir-phoenix:1.14 AS builder
+FROM hexpm/elixir:1.14.5-erlang-25.3.2.4-ubuntu-jammy-20230126 AS builder
 
 WORKDIR /app
 
-RUN apk --no-cache --update add alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3 file qemu-x86_64
+RUN apt update && \
+    DEBIAN_FRONTEND=noninteractive apt install -y \
+    libgmp-dev automake autoconf libtool inotify-tools python3 \
+    file libstdc++6 ca-certificates curl git make nodejs npm
 
-ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc \
-    GLIBC_VERSION=2.34-r0 \
-    PORT=4000 \
+ENV PORT=4000 \
     MIX_ENV="prod" \
-    SECRET_KEY_BASE="RMgI4C1HSkxsEjdhtGMfwAHfyT6CKWXOgzCboJflfSm4jeAlic52io05KB6mqzc5"
-
-RUN set -ex && \
-    apk --update add libstdc++ curl ca-certificates && \
-    for pkg in glibc-${GLIBC_VERSION} glibc-bin-${GLIBC_VERSION}; \
-        do curl -sSL ${GLIBC_REPO}/releases/download/${GLIBC_VERSION}/${pkg}.apk -o /tmp/${pkg}.apk; done && \
-    apk add --allow-untrusted /tmp/*.apk && \
-    rm -v /tmp/*.apk && \
-    /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
+    SECRET_KEY_BASE="RMgI4C1HSkxsEjdhtGMfwAHfyT6CKWXOgzCboJflfSm4jeAlic52io05KB6mqzc5" \
+    ERL_FLAGS="+JPperf true"
 
 ARG CACHE_EXCHANGE_RATES_PERIOD
 ARG DISABLE_READ_API
@@ -47,11 +41,14 @@ ADD apps/explorer/mix.exs ./apps/explorer/
 ADD apps/ethereum_jsonrpc/mix.exs ./apps/ethereum_jsonrpc/
 ADD apps/indexer/mix.exs ./apps/indexer/
 
+ENV MIX_HOME=/opt/mix
+RUN mix local.hex --force
 RUN mix do deps.get, local.rebar --force, deps.compile
 
-ADD . .
-
-COPY . .
+ADD apps ./apps
+ADD config ./config
+ADD rel ./rel
+ADD *.exs ./
 
 RUN if [ "$COIN" != "" ]; then \
         sed -i s/"POA"/"${COIN}"/g apps/block_scout_web/priv/gettext/en/LC_MESSAGES/default.po; \
@@ -61,17 +58,17 @@ RUN if [ "$COIN" != "" ]; then \
         sed -i "/msgid \"ETH\"/{n;s/msgstr \"\"/msgstr \"${COIN}\"/g}" apps/block_scout_web/priv/gettext/en/LC_MESSAGES/default.po; \
     fi
 
+
 # Run forderground build and phoenix digest
-RUN mix compile && npm install npm@latest
+RUN mix compile
+RUN npm install -g n && n 18.18.0 && apt purge -y nodejs npm
 
 # Add blockscout npm deps
 RUN cd apps/block_scout_web/assets/ && \
     npm install && \
     npm run deploy && \
     cd /app/apps/explorer/ && \
-    npm install && \
-    apk update && \
-    apk del --force-broken-world alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3
+    npm install
 
 RUN mix phx.digest
 
@@ -80,14 +77,18 @@ RUN mkdir -p /opt/release \
   && mv _build/${MIX_ENV}/rel/blockscout /opt/release
 
 ##############################################################
-FROM bitwalker/alpine-elixir-phoenix:1.14
+FROM hexpm/elixir:1.14.5-erlang-25.3.2.4-ubuntu-jammy-20230126
 
 ARG RELEASE_VERSION
 ENV RELEASE_VERSION=${RELEASE_VERSION}
 ARG BLOCKSCOUT_VERSION
 ENV BLOCKSCOUT_VERSION=${BLOCKSCOUT_VERSION}
 
-RUN apk --no-cache --update add jq
+RUN apt update && \
+    DEBIAN_FRONTEND=noninteractive apt install -y jq libgmp-dev && \
+    apt clean autoclean && \
+    apt autoremove -y && \
+    rm -rf /var/lib/{apt,dpkg,cache,log}
 
 WORKDIR /app
 
