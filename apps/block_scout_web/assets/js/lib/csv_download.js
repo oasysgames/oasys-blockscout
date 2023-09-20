@@ -48,10 +48,10 @@ $button.on('click', () => {
     disableBtnWithSpinner()
     // @ts-ignore
     // eslint-disable-next-line
-    grecaptcha.ready(function () {
+    grecaptcha.enterprise.ready(function () {
       // @ts-ignore
       // eslint-disable-next-line
-      grecaptcha.execute(reCaptchaV3ClientKey, { action: 'login' })
+      grecaptcha.enterprise.execute(reCaptchaV3ClientKey, { action: 'login' })
         .then(function (token) {
           const url = `${baseURL}&recaptcha_response=${token}`
 
@@ -61,7 +61,7 @@ $button.on('click', () => {
   } else if (reCaptchaV2ClientKey) {
     // @ts-ignore
     // eslint-disable-next-line
-    const recaptchaResponse = grecaptcha.getResponse()
+    const recaptchaResponse = grecaptcha.enterprise.getResponse()
     if (recaptchaResponse) {
       disableBtnWithSpinner()
       const url = `${baseURL}&recaptcha_response=${recaptchaResponse}`
@@ -117,7 +117,7 @@ $button.on('click', () => {
     if (resetRecaptcha) {
       // @ts-ignore
       // eslint-disable-next-line
-      grecaptcha.reset()
+      grecaptcha.enterprise.reset()
     }
   }
 
@@ -137,7 +137,7 @@ const onloadCallback = function () {
   const reCaptchaClientKey = document.getElementById('js-re-captcha-client-key').value
   // @ts-ignore
   // eslint-disable-next-line
-  grecaptcha.render('recaptcha', {
+  grecaptcha.enterprise.render('recaptcha', {
     sitekey: reCaptchaClientKey,
     theme: getThemeMode(),
     callback: function () {
