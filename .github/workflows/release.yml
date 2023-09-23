@@ -37,3 +37,20 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
           push: true
+          build-args: |
+            CACHE_EXCHANGE_RATES_PERIOD=
+            API_V1_READ_METHODS_DISABLED=false
+            DISABLE_WEBAPP=false
+            API_V1_WRITE_METHODS_DISABLED=false
+            CACHE_TOTAL_GAS_USAGE_COUNTER_ENABLED=
+            CACHE_ADDRESS_WITH_BALANCES_UPDATE_INTERVAL=
+            ADMIN_PANEL_ENABLED=
+            RELEASE_VERSION=5.2.1
+            COIN=
+            DISABLE_READ_API=false
+            API_PATH=/
+            NETWORK_PATH=/
+            DISABLE_WRITE_API=false
+            CACHE_ENABLE_TOTAL_GAS_USAGE_COUNTER=
+            SOCKET_ROOT=/
+            WOBSERVER_ENABLED=false
