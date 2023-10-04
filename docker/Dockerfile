@@ -85,7 +85,7 @@ ARG BLOCKSCOUT_VERSION
 ENV BLOCKSCOUT_VERSION=${BLOCKSCOUT_VERSION}
 
 RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive apt install -y jq libgmp-dev && \
+    DEBIAN_FRONTEND=noninteractive apt install -y jq libgmp-dev nodejs && \
     apt clean autoclean && \
     apt autoremove -y && \
     rm -rf /var/lib/{apt,dpkg,cache,log}
