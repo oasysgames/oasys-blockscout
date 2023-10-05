@@ -15,13 +15,12 @@
               to: address_path(@conn, :show, @address_hash_string)
             ) %><%= filter_text %> <%= gettext("to CSV file") %></p>
       </div>
-
       <div class="dates-container">
       from <input class="js-datepicker js-datepicker-from form-control" type="text" /> to <input class="js-datepicker js-datepicker-to form-control" type="text" />
       </div>
-
+      <div  id="recaptcha" class="mb-3" ></div>
       <div class="row align-items-end">
-        <div id="recaptcha" >
+        <div>
         <button
         id="export-csv-button"
         class="button button-primary"
@@ -31,7 +30,7 @@
         data-type=<%= @type %>><%= gettext("Download") %></button>
         </div>
         <div class="csv-doc-link ml-3 ">
-        For information on the CSV format specifications and considerations regarding the CSV data, click
+        For information on CSV file format and handling tips, please click
          <%= link(to: Application.get_env(:block_scout_web, :csv_doc_link)) do %> here<% end %>
          .</div>
         </div>
@@ -59,28 +58,7 @@
       }
     }
   </script>
-  <script type="text/javascript">
-    var widgetId1
-    var onloadCallback = function() {
-      var reCaptchaClientKey = '<%= Application.get_env(:block_scout_web, :re_captcha_client_key) %>'
-      if (reCaptchaClientKey) {
-        widgetId1 = grecaptcha.enterprise.render('recaptcha', {
-          'sitekey': reCaptchaClientKey,
-          'theme': localStorage.getItem('current-color-mode'),
-          'callback': function () {
-            document.getElementById('export-csv-button').disabled = false
-          }
-        })
-      } else {
-        Swal.fire({
-          title: 'Warning',
-          html: 'CSV download will not work since reCAPTCHA is not configured. Please advise server maintainer to configure RE_CAPTCHA_CLIENT_KEY and RE_CAPTCHA_SECRET_KEY environment variables.',
-          icon: 'warning'
-        })
-      }
-    }
-  </script>
-  <script src="https://www.google.com/recaptcha/enterprise.js?onload=onloadCallback&render=explicit" async defer>
+  <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer>
   </script>
   <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/csv-download.js") %>"></script>
 </section>
