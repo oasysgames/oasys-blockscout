@@ -1,0 +1,16 @@
+{
+  "name": "v4-to-v5",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "axios": "^1.5.1",
+    "ts-node": "^10.9.1"
+  }
+}
