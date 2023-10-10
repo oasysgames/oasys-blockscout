@@ -31,7 +31,7 @@
         </div>
         <div class="csv-doc-link ml-3 ">
         For information on CSV file format and handling tips, please click
-         <%= link(to: Application.get_env(:block_scout_web, :csv_doc_link)) do %> here<% end %>
+         <%= link(to: Application.get_env(:block_scout_web, :csv_doc_link)||"https://docs.oasys.games/docs/staking/explore/1-2-csv-download" ) do %> here<% end %>
          .</div>
         </div>
       </div>
