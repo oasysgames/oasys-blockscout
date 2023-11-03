@@ -39,6 +39,16 @@
     <meta name="msapplication-config" content="<%= static_path(@conn, "/browserconfig.xml") %>">
     <meta name="theme-color" content="#ffffff">
 
+    <!-- TWITTER -->
+    <meta name="twitter:image" content="<%= static_path(@conn, "/images/oasys_og.png") %>" />
+
+    <!-- NORMAL -->
+    <meta property="image" content="<%= static_path(@conn, "/images/oasys_og.png") %>" />
+    <meta property="image:type" content="image/png" />
+
+    <!-- Open Graph -->
+    <meta property="og:image" content="<%= static_path(@conn, "/images/oasys_og.png") %>" />
+
     <%= render_existing(@view_module, "_metatags.html", assigns) || render("_default_title.html") %>
 
     <script defer data-cfasync="false">
