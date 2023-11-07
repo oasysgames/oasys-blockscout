@@ -40,7 +40,11 @@
     <meta name="theme-color" content="#ffffff">
 
     <!-- TWITTER -->
-    <meta name="twitter:image" content="<%= static_path(@conn, "/images/oasys_og.png") %>" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/oasysgames/oasys-blockscout/dcbe48c6a4f64b491754e5e1ed694eba85eeef13/apps/block_scout_web/assets/static/images/oasys_og.png" />
+    <meta name="twitter:title" content="<%= raw(System.get_env("SUBNETWORK")) %>" />
+    <meta name="twitter:description" content="<%= raw(System.get_env("SUBNETWORK")) %>" />
+    <meta name="twitter:site" content="@oasys" />
 
     <!-- NORMAL -->
     <meta property="image" content="<%= static_path(@conn, "/images/oasys_og.png") %>" />
