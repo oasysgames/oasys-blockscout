@@ -41,7 +41,7 @@
 
     <!-- TWITTER -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://raw.githubusercontent.com/oasysgames/oasys-blockscout/dcbe48c6a4f64b491754e5e1ed694eba85eeef13/apps/block_scout_web/assets/static/images/oasys_og.png" />
+    <meta name="twitter:image" content="https://oasys-blockscout-networks.s3.ap-northeast-1.amazonaws.com/oasys-logo-1113.png" />
     <meta name="twitter:title" content="<%= raw(System.get_env("SUBNETWORK")) %>" />
     <meta name="twitter:description" content="<%= raw(System.get_env("SUBNETWORK")) %>" />
     <meta name="twitter:site" content="@oasys" />
