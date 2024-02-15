@@ -3,7 +3,7 @@ defmodule BlockScoutWeb.LayoutView do
 
   alias Explorer.Chain
   alias Plug.Conn
-  alias Poison.Parser
+  alias Poison
 
   import BlockScoutWeb.APIDocsView, only: [blockscout_url: 1]
 
@@ -145,26 +145,70 @@ defmodule BlockScoutWeb.LayoutView do
   def ignore_version?("unknown"), do: true
   def ignore_version?(_), do: false
 
+  # def other_networks do
+  #   get_other_networks =
+  #     if Application.get_env(:block_scout_web, :other_networks) do
+  #       try do
+  #         :block_scout_web
+  #         |> Application.get_env(:other_networks)
+  #         |> Parser.parse!(%{keys: :atoms!})
+  #       rescue
+  #         _ ->
+  #           []
+  #       end
+  #     else
+  #       @default_other_networks
+  #     end
+
+  # get_other_networks
+  # |> Enum.reject(fn %{title: title} ->
+  #   title == subnetwork_title()
+  # end)
+  # end
   def other_networks do
     get_other_networks =
-      if Application.get_env(:block_scout_web, :other_networks) do
+      if Application.get_env(:block_scout_web, :s3_network_url) do
         try do
-          :block_scout_web
-          |> Application.get_env(:other_networks)
-          |> Parser.parse!(%{keys: :atoms!})
+          s3_json_api_url = Application.get_env(:block_scout_web, :s3_network_url)
+
+          case HTTPoison.get(s3_json_api_url, []) do
+            {:ok, %{status_code: 200, body: data}} ->
+              IO.puts("Data successfully fetched from Other Network:")
+              IO.inspect(data, label: "Other Network Data")
+              Poison.Parser.parse!(data, %{keys: :atoms!})
+            {:ok, %{status_code: status_code, body: _body}} ->
+              IO.puts("Failed to fetch data from Other Network. Unexpected status code: #{status_code}")
+              @default_other_networks
+
+            {:error, reason} ->
+              IO.puts("An error occurred while processing other networks. Returning default other networks.")
+              @default_other_networks
+          end
         rescue
-          _ ->
-            []
+          error ->
+            IO.puts("An error occurred while processing other networks: #{inspect error}")
+            @default_other_networks
         end
       else
-        @default_other_networks
+        try do
+          Application.get_env(:block_scout_web, :other_networks)
+          |> Poison.Parser.parse!(%{keys: :atoms!})
+        rescue
+          error ->
+            IO.puts("An error occurred while retrieving other networks from configuration: #{inspect error}")
+            @default_other_networks
+        end
       end
 
     get_other_networks
     |> Enum.reject(fn %{title: title} ->
       title == subnetwork_title()
     end)
+
   end
+
+
+
 
   def main_nets(nets) do
     nets
@@ -247,7 +291,7 @@ defmodule BlockScoutWeb.LayoutView do
     if apps do
       try do
         apps
-        |> Parser.parse!(%{keys: :atoms!})
+        |> Poison.Parser.parse!(%{keys: :atoms!})
       rescue
         _ ->
           []
