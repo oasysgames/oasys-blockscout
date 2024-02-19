@@ -37,6 +37,18 @@ See the [project documentation](https://docs.blockscout.com/) for instructions:
 - [ENV variables](https://docs.blockscout.com/for-developers/information-and-settings/env-variables)
 - [Configuration options](https://docs.blockscout.com/for-developers/configuration-options)
 
+### Setting Network Information
+
+- Static content:
+  - Open file `common-blockscout.env`
+  - Find the `SUPPORTED_CHAINS`. Assign it to the list of network. [See more](https://docs.blockscout.com/for-developers/information-and-settings/env-variables).
+  - **IMPORTANT**: Must restart the Blockscout whenever changing the value of `SUPPORTED_CHAINS` to make it work.
+
+- Dynamic content:
+  - Open file `common-blockscout.env`
+  - Add a new variable named `S3_NETWORK_URL`. The file must be public, the content is match [the SUPPORTED_CHAINS data type](https://docs.blockscout.com/for-developers/information-and-settings/env-variables).
+  - Every time the website is opened/reloaded, it will fetches the content of the file.
+
 ## Acknowledgements
 
 We would like to thank the [EthPrize foundation](http://ethprize.io/) for their funding support.
