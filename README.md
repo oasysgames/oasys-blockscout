@@ -49,3 +49,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution and pull request protoco
 [![License: GPL v3.0](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+
+## How To Run
+
+1. Configure back-end ENV variables following [docs](https://docs.blockscout.com/for-developers/information-and-settings/env-variables)
+
+2. Configure front-end ENV variables following [docs](https://docs.blockscout.com/for-developers/information-and-settings/env-variables/frontend-common-envs)
+
+3. Configure docker compose [docker-compose.yml](/docker-compose/docker-compose.yml)
+
+4. Configure web-server `Access-Control-Allow-Origin` on file [default.conf.template](/docker-compose/proxy/default.conf.template)
+
+5. Start the docker by running `docker-compose up --build -d`

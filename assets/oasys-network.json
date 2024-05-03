@@ -1,0 +1,116 @@
+[
+  {
+    "title": "HUB-Mainnet",
+    "url": "https://explorer.oasys.games/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "HUB-Testnet",
+    "url": "https://explorer.testnet.oasys.games/",
+    "group": "Mainnets",
+    "icon": ""
+  },
+  {
+    "title": "SAND-Verse",
+    "url": "https://explorer.sandverse.oasys.games/",
+    "group": "Mainnets",
+    "icon": ""
+  },
+  {
+    "title": "MCHVerse-Mainnet",
+    "url": "https://explorer.oasys.mycryptoheroes.net/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "TCGVerse-Mainnet",
+    "url": "https://explorer.tcgverse.xyz/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "HomeVerse-Mainnet",
+    "url": "https://explorer.oasys.homeverse.games/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "SaakuruVerse-Mainnet",
+    "url": "https://explorer.saakuru.network/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "MCHVerse-Testnet",
+    "url": "https://explorer.oasys.sand.mchdfgh.xyz/",
+    "group": "Mainnets",
+    "icon": ""
+  },
+  {
+    "title": "TCGVerse-Testnet",
+    "url": "https://explorer.testnet.tcgverse.xyz/",
+    "group": "Mainnets",
+    "icon": ""
+  },
+  {
+    "title": "HOMEVerse-Testnet",
+    "url": "https://explorer.testnet.oasys.homeverse.games/",
+    "group": "Mainnets",
+    "icon": ""
+  },
+  {
+    "title": "DM2 Verse",
+    "url": "https://explorer.dm2verse.dmm.com/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "GESO Verse-Mainnet",
+    "url": "https://explorer.verse.gesoten.com/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "GESO Verse-Testnet",
+    "url": "https://explorer.testnet.verse.gesoten.com/",
+    "group": "Mainnets",
+    "icon": ""
+  },
+  {
+    "title": "YooldoVerse-Testnet",
+    "url": "https://explorer.testnet.yooldo-verse.xyz/",
+    "group": "Mainnets",
+    "icon": ""
+  },
+  {
+    "title": "YooldoVerse-Mainnet",
+    "url": "https://explorer.yooldo-verse.xyz/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "Chainverse-Mainnet",
+    "url": "https://explorer.chainverse.info/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "DeFiVerse-Mainnet",
+    "url": "https://scan.defi-verse.org/",
+    "group": "Testnets",
+    "icon": ""
+  },
+  {
+    "title": "Saakuru-Testnet",
+    "url": "https://explorer-testnet.saakuru.network/",
+    "group": "Mainnets",
+    "icon": ""
+  },
+  {
+    "title": "DeFiVerse-Testnet",
+    "url": "https://scan-testnet.defi-verse.org/",
+    "group": "Mainnets",
+    "icon": ""
+  }
+]

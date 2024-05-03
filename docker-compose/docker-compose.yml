@@ -41,10 +41,11 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545/
-        ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:8545/
-        ETHEREUM_JSONRPC_WS_URL: ws://host.docker.internal:8545/
-        CHAIN_ID: '1337'
+        # hub mainnet
+        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.mainnet.oasys.games
+        ETHEREUM_JSONRPC_TRACE_URL: https://rpc.mainnet.oasys.games
+        ETHEREUM_JSONRPC_WS_URL: wss://ws.mainnet.oasys.games
+        CHAIN_ID: '248'
 
   visualizer:
     extends:
@@ -84,11 +85,19 @@ services:
       file: ./services/stats.yml
       service: stats
 
+  sc-verifier:
+    extends:
+      file: ./services/smart-contract-verifier.yml
+      service: smart-contract-verifier
+    ports:
+      - 8082:8050
+
   proxy:
     depends_on:
       - backend
       - frontend
       - stats
+      - sc-verifier
     extends:
       file: ./services/nginx.yml
       service: proxy

@@ -1,0 +1,87 @@
+[
+  {
+    "title": "HUB-Mainnet",
+    "url": "https://explorer.oasys.games/"
+  },
+  {
+    "title": "HUB-Testnet",
+    "url": "https://explorer.testnet.oasys.games/",
+    "test_net?": true
+  },
+  {
+    "title": "SAND-Verse",
+    "url": "https://explorer.sandverse.oasys.games/",
+    "test_net?": true
+  },
+  {
+    "title": "MCHVerse-Mainnet",
+    "url": "https://explorer.oasys.mycryptoheroes.net/"
+  },
+  {
+    "title": "TCGVerse-Mainnet",
+    "url": "https://explorer.tcgverse.xyz/"
+  },
+  {
+    "title": "HomeVerse-Mainnet",
+    "url": "https://explorer.oasys.homeverse.games/"
+  },
+  {
+    "title": "SaakuruVerse-Mainnet",
+    "url": "https://explorer.saakuru.network/"
+  },
+  {
+    "title": "MCHVerse-Testnet",
+    "url": "https://explorer.oasys.sand.mchdfgh.xyz/",
+    "test_net?": true
+  },
+  {
+    "title": "TCGVerse-Testnet",
+    "url": "https://explorer.testnet.tcgverse.xyz/",
+    "test_net?": true
+  },
+  {
+    "title": "HOMEVerse-Testnet",
+    "url": "https://explorer.testnet.oasys.homeverse.games/",
+    "test_net?": true
+  },
+  {
+    "title": "DM2 Verse",
+    "url": "https://explorer.dm2verse.dmm.com/"
+  },
+  {
+    "title": "GESO Verse-Mainnet",
+    "url": "https://explorer.verse.gesoten.com/"
+  },
+  {
+    "title": "GESO Verse-Testnet",
+    "url": "https://explorer.testnet.verse.gesoten.com/",
+    "test_net?": true
+  },
+  {
+    "title": "YooldoVerse-Testnet",
+    "url": "https://explorer.testnet.yooldo-verse.xyz/",
+    "test_net?": true
+  },
+  {
+    "title": "YooldoVerse-Mainnet",
+    "url": "https://explorer.yooldo-verse.xyz/"
+  },
+  {
+    "title": "Chainverse-Mainnet",
+    "url": "https://explorer.chainverse.info/"
+  },
+  {
+    "title": "DeFiVerse-Mainnet",
+    "url": "https://scan.defi-verse.org/"
+  },
+  {
+    "title": "Saakuru-Testnet",
+    "url": "https://explorer-testnet.saakuru.network/",
+    "test_net?": true
+  },
+  {
+    "title": "DeFiVerse-Testnet",
+    "url": "https://scan-testnet.defi-verse.org/",
+    "test_net?": true
+  }
+]
